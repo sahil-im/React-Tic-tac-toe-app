@@ -2,19 +2,48 @@ import Players from "./Components/Players"
 import GameBord from "./Components/GameBord"
 import { useState } from "react"
 import Log from "./Components/Log"
-function App() {
-  const [gameTurn,setGameTurn]= useState([])
-  const [activePlayer,setActivePlayer] = useState("X")
-  function handleSelectedSqure(rawIndex,colIndex)
-{
-  setActivePlayer((currentPlayer)=>currentPlayer === "X" ? "O" :"X")
-  setGameTurn((previousTurn) =>{
-    let currentPlayer = 'X'
+import { WINNING_COMBINATIONS } from "./winning-combinations"
+// CHILD FUNCTION 
 
-    if(previousTurn.length > 0 && previousTurn[0].player ==='X')
+
+const initialGameBord = [
+    [null,null,null],
+    [null,null,null],
+    [null,null,null]
+]
+
+function derivedActivePlayer(gameTurn){
+  let currentPlayer = 'X'
+
+    if(gameTurn.length > 0 && gameTurn[0].player ==='X')
     {
       currentPlayer = 'O';
     }
+    return currentPlayer
+}
+
+function App() {
+  const [gameTurn,setGameTurn]= useState([])
+  let activePlayer = derivedActivePlayer(gameTurn)
+  let gameBord = initialGameBord
+
+for(const turn of gameTurn)
+{
+    const {square ,player}  = turn
+    const {raw,col} = square
+    gameBord[raw][col] = player
+}
+
+for(combination of WINNING_COMBINATIONS)
+{
+  
+}
+  function handleSelectedSqure(rawIndex,colIndex)
+{
+  // setActivePlayer((currentPlayer)=>currentPlayer === "X" ? "O" :"X")
+  setGameTurn((previousTurn) =>{
+      let currentPlayer = derivedActivePlayer(previousTurn)
+      
     const updatedTurns = [
       {
         square:{raw:rawIndex,col:colIndex},player:currentPlayer
@@ -31,9 +60,9 @@ function App() {
         <Players InitialPlayerName={"Player 1"} PlayerSymbol={"X"} isActive={activePlayer === "X"}/>
         <Players InitialPlayerName={"Player 2"} PlayerSymbol={"O"} isActive={activePlayer === "O"}/>
       </ol>
-      <GameBord onSelectSquar={handleSelectedSqure} turns={gameTurn}/>
+      <GameBord onSelectSquar={handleSelectedSqure} bord={gameBord}/>
     </div>
-    <Log/>
+    <Log turns={gameTurn}/>
     </main>
     
   )
